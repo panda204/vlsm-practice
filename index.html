@@ -31,40 +31,29 @@
 
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background-image:
                 linear-gradient(rgba(0,160,255,0.04) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0,160,255,0.04) 1px, transparent 1px);
             background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
-
         body::after {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: repeating-linear-gradient(
                 0deg, transparent, transparent 2px,
                 rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
             );
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
 
-        .wrapper {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 900px;
-        }
+        .wrapper { position: relative; z-index: 1; width: 100%; max-width: 960px; }
 
-        header { text-align: center; margin-bottom: 24px; }
-
+        header { text-align: center; margin-bottom: 22px; }
         .title {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(1.4rem, 4vw, 2.4rem);
+            font-size: clamp(1.3rem, 4vw, 2.3rem);
             font-weight: 900;
             letter-spacing: 0.08em;
             background: linear-gradient(135deg, #00e5ff, #7b61ff, #ff3a6e);
@@ -72,47 +61,79 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1.1;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
+        .subtitle { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.06em; }
 
-        .subtitle {
-            color: var(--muted);
-            font-size: 0.82rem;
-            letter-spacing: 0.06em;
-        }
-
+        /* ── Controls panel ── */
         .controls {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 18px 22px;
-            margin-bottom: 16px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            align-items: center;
-            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-end;
         }
 
-        .slider-group { flex: 1; min-width: 260px; }
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .control-group.grow { flex: 1; min-width: 220px; }
 
+        .ctrl-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        /* Network address input */
+        .net-row { display: flex; gap: 6px; align-items: center; }
+
+        .net-input {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            background: #060d1a;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            padding: 8px 12px;
+            outline: none;
+            width: 160px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .net-input:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 10px rgba(0,229,255,0.25);
+        }
+        .net-input.error {
+            border-color: #ff3a6e;
+            box-shadow: 0 0 10px rgba(255,58,110,0.3);
+        }
+
+        .net-sep {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            color: var(--muted);
+            padding: 0 2px;
+        }
+
+        /* Slider */
         .slider-label {
             font-size: 0.78rem;
             color: var(--muted);
             letter-spacing: 0.1em;
-            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .slider-label span {
             font-family: 'Orbitron', monospace;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--text);
         }
-
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
@@ -122,90 +143,83 @@
             outline: none;
             cursor: pointer;
         }
-
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 20px; height: 20px;
             border-radius: 50%;
             background: #00e5ff;
             box-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0,229,255,0.4);
             cursor: pointer;
         }
-
         .tick-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 6px;
+            margin-top: 4px;
             padding: 0 2px;
         }
+        .tick { font-size: 0.58rem; color: var(--muted); opacity: 0.5; }
 
-        .tick { font-size: 0.6rem; color: var(--muted); opacity: 0.5; }
-
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-
+        /* Buttons */
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
         .btn {
             font-family: 'Orbitron', monospace;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 0.08em;
-            padding: 10px 18px;
+            padding: 9px 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
+            white-space: nowrap;
         }
-
         .btn-primary {
-            background: transparent;
-            color: #00e5ff;
+            background: transparent; color: #00e5ff;
             border: 1px solid #00e5ff;
-            box-shadow: 0 0 8px rgba(0,229,255,0.25), inset 0 0 8px rgba(0,229,255,0.05);
+            box-shadow: 0 0 8px rgba(0,229,255,0.2);
         }
-        .btn-primary:hover {
-            background: rgba(0,229,255,0.1);
-            box-shadow: 0 0 18px rgba(0,229,255,0.5);
-        }
-
+        .btn-primary:hover { background: rgba(0,229,255,0.1); box-shadow: 0 0 16px rgba(0,229,255,0.5); }
         .btn-danger {
-            background: transparent;
-            color: #ff3a6e;
+            background: transparent; color: #ff3a6e;
             border: 1px solid #ff3a6e;
-            box-shadow: 0 0 8px rgba(255,58,110,0.25);
+            box-shadow: 0 0 8px rgba(255,58,110,0.2);
         }
-        .btn-danger:hover {
-            background: rgba(255,58,110,0.1);
-            box-shadow: 0 0 18px rgba(255,58,110,0.5);
-        }
+        .btn-danger:hover { background: rgba(255,58,110,0.1); box-shadow: 0 0 16px rgba(255,58,110,0.5); }
 
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-            justify-content: center;
-        }
-
-        .legend-item {
+        /* Network display badge */
+        .net-badge {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.7rem;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
             color: var(--muted);
         }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            flex-shrink: 0;
+        .net-badge-addr {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #00e5ff;
+            text-shadow: 0 0 10px rgba(0,229,255,0.5);
         }
+        .net-badge-detail { color: var(--muted); font-size: 0.72rem; }
+        .net-badge-detail span { color: var(--text); }
 
-        /* ── CANVAS ──────────────────────────────────────────────────────────
-         * CSS Grid — each leaf gets a named grid-area that always fills its
-         * allocated cell completely. No flex shrinking, no fixed heights.
-         */
+        /* Legend */
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-bottom: 10px; justify-content: center;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--muted); }
+        .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+        /* ── CANVAS ── */
         #canvas {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -225,85 +239,116 @@
             align-items: center;
             justify-content: center;
             cursor: crosshair;
-            overflow: hidden;
+            /* CRITICAL: no overflow:hidden — let content scale, not clip */
             transition: background 0.15s, box-shadow 0.15s;
+            container-type: size; /* enable container queries */
         }
 
-        /* "SPLIT" hint in corner */
-        .cell::after {
-            content: 'SPLIT ÷';
+        .cell:hover .split-hint { opacity: 0.5; }
+
+        .split-hint {
             position: absolute;
-            bottom: 5px;
-            right: 7px;
-            font-size: 0.5em;
+            bottom: 4px; right: 6px;
+            font-size: 0.48em;
             opacity: 0;
             transition: opacity 0.2s;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             pointer-events: none;
+            white-space: nowrap;
         }
-        .cell:hover::after { opacity: 0.55; }
 
+        /* cell-inner scales via container query — no JS font sizing needed */
         .cell-inner {
-            text-align: center;
-            padding: 4px 6px;
             width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4% 3%;
             pointer-events: none;
+            overflow: hidden;
+            gap: 0;
         }
 
+        /* CIDR: scales with container width, never overflows */
         .cell-cidr {
             font-family: 'Orbitron', monospace;
             font-weight: 900;
             line-height: 1;
-            /* font-size injected by JS */
+            /* Scale font to 22% of container width, capped at a sane max */
+            font-size: clamp(8px, 22cqw, 56px);
+            white-space: nowrap;
+            text-align: center;
+            width: 100%;
         }
 
+        /* Info lines: scale to 8% of container width */
         .cell-info {
-            margin-top: 0.3em;
-            line-height: 1.6;
-            /* font-size injected by JS */
+            width: 100%;
+            text-align: center;
+            margin-top: 4%;
+            /* each row rendered via spans */
         }
 
-        .cell-row { display: block; }
-        .cell-row.label { opacity: 0.5; font-size: 0.78em; letter-spacing: 0.06em; }
-        .cell-row.value { opacity: 0.9; }
-        .cell-row.dim   { opacity: 0.45; }
+        .cell-info .row {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cell-info .lbl {
+            font-size: clamp(5px, 5.5cqw, 10px);
+            opacity: 0.45;
+            letter-spacing: 0.08em;
+            margin-top: 3%;
+        }
+        .cell-info .val {
+            font-size: clamp(6px, 7cqw, 13px);
+            opacity: 0.9;
+        }
+        .cell-info .dim {
+            font-size: clamp(5px, 5.5cqw, 10px);
+            opacity: 0.4;
+            margin-top: 3%;
+        }
 
         @keyframes splitIn {
-            from { opacity: 0; transform: scale(0.86); }
+            from { opacity: 0; transform: scale(0.84); }
             to   { opacity: 1; transform: scale(1); }
         }
-        .cell.new { animation: splitIn 0.22s ease forwards; }
+        .cell.new { animation: splitIn 0.2s ease forwards; }
 
+        /* Info bar */
         .info-bar {
-            margin-top: 12px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
+            margin-top: 10px;
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
         }
-
         .info-chip {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 4px;
-            padding: 6px 14px;
-            font-size: 0.72rem;
+            padding: 5px 12px;
+            font-size: 0.7rem;
             color: var(--muted);
             letter-spacing: 0.05em;
         }
         .info-chip strong { color: var(--text); font-weight: normal; }
 
+        /* Toast */
         #toast {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
+            bottom: 28px; left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: #0a1628;
             border: 1px solid #ff3a6e;
             color: #ff3a6e;
-            padding: 10px 22px;
+            padding: 9px 20px;
             border-radius: 4px;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             opacity: 0;
             transition: all 0.3s ease;
             pointer-events: none;
@@ -322,24 +367,51 @@
     </header>
 
     <div class="controls">
-        <div class="slider-group">
+
+        <!-- Network address input -->
+        <div class="control-group">
+            <div class="ctrl-label">Network Address</div>
+            <div class="net-row">
+                <input class="net-input" id="oct1" type="text" maxlength="3" value="10"  placeholder="10">
+                <span class="net-sep">.</span>
+                <input class="net-input" id="oct2" type="text" maxlength="3" value="0"   placeholder="0">
+                <span class="net-sep">.</span>
+                <input class="net-input" id="oct3" type="text" maxlength="3" value="0"   placeholder="0">
+                <span class="net-sep">.</span>
+                <input class="net-input" id="oct4" type="text" maxlength="3" value="0"   placeholder="0">
+            </div>
+        </div>
+
+        <!-- Prefix slider -->
+        <div class="control-group grow">
             <div class="slider-label">
-                STARTING PREFIX
+                <span class="ctrl-label">Starting Prefix</span>
                 <span id="prefixDisplay">/24</span>
             </div>
-            <input type="range" id="prefixSlider" min="0" max="30" value="24" step="1">
+            <input type="range" id="prefixSlider" min="1" max="30" value="24" step="1">
             <div class="tick-row">
-                <span class="tick">/0</span>
+                <span class="tick">/1</span>
                 <span class="tick">/8</span>
                 <span class="tick">/16</span>
                 <span class="tick">/24</span>
                 <span class="tick">/30</span>
             </div>
         </div>
+
+        <!-- Buttons -->
         <div class="btn-group">
             <button class="btn btn-primary" id="applyBtn">APPLY</button>
             <button class="btn btn-danger"  id="resetBtn">RESET</button>
         </div>
+
+    </div>
+
+    <!-- Active network badge -->
+    <div class="net-badge" id="netBadge">
+        <div class="net-badge-addr" id="badgeAddr">10.0.0.0/24</div>
+        <div class="net-badge-detail">TOTAL IPs: <span id="badgeTotal">256</span></div>
+        <div class="net-badge-detail">USABLE: <span id="badgeUsable">254</span></div>
+        <div class="net-badge-detail">MASK: <span id="badgeMask">255.255.255.0</span></div>
     </div>
 
     <div class="legend" id="legend"></div>
@@ -371,37 +443,53 @@ function hexToRgba(hex, a) {
     return `rgba(${r},${g},${b},${a})`;
 }
 
-// ── IP helpers ────────────────────────────────────────────────────────────────
-function blockInfo(prefix, startOct, endOct) {
-    const total  = endOct - startOct + 1;
-    const usable = Math.max(0, total - 2);
-    return {
-        total,
-        usable,
-        network : `10.0.0.${startOct}`,
-        bcast   : `10.0.0.${endOct}`,
-        firstH  : total >= 4 ? `10.0.0.${startOct + 1}` : `10.0.0.${startOct}`,
-        lastH   : total >= 4 ? `10.0.0.${endOct  - 1}` : `10.0.0.${endOct}`,
-    };
+// ── IP math ───────────────────────────────────────────────────────────────────
+function ipToInt(a,b,c,d) { return ((a<<24)|(b<<16)|(c<<8)|d) >>> 0; }
+function intToIp(n) {
+    return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+}
+function maskFromPrefix(p) {
+    return p === 0 ? 0 : (0xFFFFFFFF << (32-p)) >>> 0;
+}
+function subnetMaskStr(p) { return intToIp(maskFromPrefix(p)); }
+
+// Given a network base IP (as int) and a prefix, return block info
+function blockInfo(baseInt, prefix) {
+    const size    = Math.pow(2, 32 - prefix);
+    const total   = size;
+    const usable  = prefix <= 30 ? Math.max(0, total - 2) : total === 1 ? 1 : 0;
+    const network = intToIp(baseInt);
+    const bcast   = intToIp((baseInt + size - 1) >>> 0);
+    const firstH  = total >= 4 ? intToIp((baseInt + 1) >>> 0) : network;
+    const lastH   = total >= 4 ? intToIp((baseInt + size - 2) >>> 0) : bcast;
+    return { total, usable, network, bcast, firstH, lastH };
 }
 
-// ── Tree ──────────────────────────────────────────────────────────────────────
-let tree = null;
+function formatCount(n) {
+    if (n >= 1e9) return (n/1e9).toFixed(2).replace(/\.?0+$/,'')+'B';
+    if (n >= 1e6) return (n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M';
+    if (n >= 1e3) return (n/1e3).toFixed(1).replace(/\.?0+$/,'')+'K';
+    return n;
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let baseIp     = ipToInt(10,0,0,0);
 let startPrefix = 24;
-let splitCount = 0;
-let nodeSeq = 0;
+let splitCount  = 0;
+let nodeSeq     = 0;
+let tree        = null;
 
-function makeNode(prefix, startOct, endOct) {
-    return { id: `n${nodeSeq++}`, prefix, startOct, endOct, split: null };
+function makeNode(prefix, ipInt) {
+    return { id: `n${nodeSeq++}`, prefix, ipInt, split: null };
 }
-
 function initTree() {
-    nodeSeq = 0;
-    splitCount = 0;
-    tree = makeNode(startPrefix, 0, 255);
+    nodeSeq = 0; splitCount = 0;
+    // Align baseIp to the network boundary for the chosen prefix
+    const mask = maskFromPrefix(startPrefix);
+    const alignedBase = (baseIp & mask) >>> 0;
+    tree = makeNode(startPrefix, alignedBase);
 }
-
-function collectLeaves(node, out = []) {
+function collectLeaves(node, out=[]) {
     if (!node.split) { out.push(node); return out; }
     collectLeaves(node.split.left, out);
     collectLeaves(node.split.right, out);
@@ -409,164 +497,113 @@ function collectLeaves(node, out = []) {
 }
 
 // ── Grid layout ───────────────────────────────────────────────────────────────
-/*
- * We build a 2-D grid (array of arrays of node IDs) by recursively combining
- * left and right subtrees. Each leaf occupies exactly its allocated cells.
- * The resulting areas string drives CSS grid-template-areas, so every cell
- * always fills 100% of its grid track — no shrinking.
- */
 function computeGrid(node) {
-    if (!node.split) {
-        return { cols: 1, rows: 1, areas: [[node.id]] };
-    }
-
+    if (!node.split) return { cols:1, rows:1, areas:[[node.id]] };
     const L = computeGrid(node.split.left);
     const R = computeGrid(node.split.right);
-
     if (node.split.dir === 'v') {
-        // Side by side → columns grow
         const rows = Math.max(L.rows, R.rows);
         const La = stretchRows(L.areas, rows);
         const Ra = stretchRows(R.areas, rows);
-        return {
-            cols: L.cols + R.cols,
-            rows,
-            areas: La.map((row, i) => [...row, ...Ra[i]])
-        };
+        return { cols: L.cols+R.cols, rows, areas: La.map((row,i)=>[...row,...Ra[i]]) };
     } else {
-        // Stacked → rows grow
         const cols = Math.max(L.cols, R.cols);
         const La = stretchCols(L.areas, cols);
         const Ra = stretchCols(R.areas, cols);
-        return {
-            cols,
-            rows: L.rows + R.rows,
-            areas: [...La, ...Ra]
-        };
+        return { cols, rows: L.rows+R.rows, areas:[...La,...Ra] };
     }
 }
-
-function stretchRows(areas, targetRows) {
-    const r = areas.map(row => [...row]);
-    while (r.length < targetRows) r.push([...r[r.length - 1]]);
+function stretchRows(areas, t) {
+    const r = areas.map(row=>[...row]);
+    while(r.length<t) r.push([...r[r.length-1]]);
     return r;
 }
-
-function stretchCols(areas, targetCols) {
-    return areas.map(row => {
-        const r = [...row];
-        while (r.length < targetCols) r.push(r[r.length - 1]);
-        return r;
-    });
+function stretchCols(areas, t) {
+    return areas.map(row=>{ const r=[...row]; while(r.length<t) r.push(r[r.length-1]); return r; });
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 
-function render(animateIds = []) {
+function render(animateIds=[]) {
     const grid = computeGrid(tree);
 
     canvas.style.gridTemplateColumns = `repeat(${grid.cols}, 1fr)`;
     canvas.style.gridTemplateRows    = `repeat(${grid.rows}, 1fr)`;
-    canvas.style.gridTemplateAreas   = grid.areas.map(r => `"${r.join(' ')}"`).join(' ');
-
+    canvas.style.gridTemplateAreas   = grid.areas.map(r=>`"${r.join(' ')}"`).join(' ');
     canvas.innerHTML = '';
 
-    // Measure canvas for font scaling
-    const canvasW  = canvas.offsetWidth  || 700;
-    const canvasH  = canvas.offsetHeight || 700;
-    const cellW    = canvasW / grid.cols;
-    const cellH    = canvasH / grid.rows;
-    const cellMin  = Math.min(cellW, cellH);
-
-    // Text size thresholds
-    const cidrPx   = Math.max(10, Math.min(cellMin * 0.24, 60));
-    const infoPx   = Math.max(7,  Math.min(cellMin * 0.095, 15));
-    const showFull = cellMin >= 90;   // show all 4 rows
-    const showMid  = cellMin >= 55;   // show network + bcast only
-    const showMin  = cellMin >= 32;   // show at least something
-
     collectLeaves(tree).forEach(node => {
-        const color = COLORS[Math.min(node.prefix, COLORS.length - 1)];
-        const info  = blockInfo(node.prefix, node.startOct, node.endOct);
-        const isNew = animateIds.includes(node.id);
+        const color  = COLORS[Math.min(node.prefix, COLORS.length-1)];
+        const info   = blockInfo(node.ipInt, node.prefix);
+        const isNew  = animateIds.includes(node.id);
 
         const cell = document.createElement('div');
         cell.className = 'cell' + (isNew ? ' new' : '');
         cell.style.gridArea        = node.id;
         cell.style.backgroundColor = hexToRgba(color, 0.06);
         cell.style.border          = `1px solid ${hexToRgba(color, 0.28)}`;
-        cell.style.color           = color;
 
         cell.addEventListener('mouseenter', () => {
-            cell.style.backgroundColor = hexToRgba(color, 0.14);
-            cell.style.boxShadow = `inset 0 0 28px ${hexToRgba(color, 0.2)}`;
+            cell.style.backgroundColor = hexToRgba(color, 0.13);
+            cell.style.boxShadow = `inset 0 0 28px ${hexToRgba(color, 0.18)}`;
         });
         cell.addEventListener('mouseleave', () => {
             cell.style.backgroundColor = hexToRgba(color, 0.06);
             cell.style.boxShadow = 'none';
         });
 
-        // ── Content ────────────────────────────────────────────────────────
+        // ── Content (all font sizes via cqw — container query units) ──
         const inner = document.createElement('div');
         inner.className = 'cell-inner';
 
-        // CIDR badge
+        // CIDR — always visible, scales with container
         const cidrEl = document.createElement('div');
-        cidrEl.className   = 'cell-cidr';
-        cidrEl.style.fontSize   = `${cidrPx}px`;
+        cidrEl.className = 'cell-cidr';
         cidrEl.style.color      = color;
-        cidrEl.style.textShadow = `0 0 ${Math.round(cidrPx * 0.55)}px ${hexToRgba(color, 0.65)}`;
+        cidrEl.style.textShadow = `0 0 16px ${hexToRgba(color, 0.7)}`;
         cidrEl.textContent = `/${node.prefix}`;
         inner.appendChild(cidrEl);
 
-        if (showMin) {
-            const infoEl = document.createElement('div');
-            infoEl.className = 'cell-info';
-            infoEl.style.fontSize = `${infoPx}px`;
-            infoEl.style.color    = color;
+        // Info block — always rendered, CSS handles scaling/hiding
+        const infoEl = document.createElement('div');
+        infoEl.className = 'cell-info';
+        infoEl.style.color = color;
+        infoEl.innerHTML = `
+            <span class="row lbl">NETWORK</span>
+            <span class="row val">${info.network}</span>
+            <span class="row lbl">FIRST HOST</span>
+            <span class="row val">${info.firstH}</span>
+            <span class="row lbl">LAST HOST</span>
+            <span class="row val">${info.lastH}</span>
+            <span class="row lbl">BROADCAST</span>
+            <span class="row val">${info.bcast}</span>
+            <span class="row dim">${formatCount(info.total)} IPs · ${formatCount(info.usable)} usable</span>
+        `;
+        inner.appendChild(infoEl);
 
-            if (showFull) {
-                infoEl.innerHTML = `
-                    <span class="cell-row label">NETWORK</span>
-                    <span class="cell-row value">${info.network}</span>
-                    <span class="cell-row label">FIRST HOST</span>
-                    <span class="cell-row value">${info.firstH}</span>
-                    <span class="cell-row label">LAST HOST</span>
-                    <span class="cell-row value">${info.lastH}</span>
-                    <span class="cell-row label">BROADCAST</span>
-                    <span class="cell-row value">${info.bcast}</span>
-                    <span class="cell-row dim">${info.total} IPs · ${info.usable} usable</span>
-                `;
-            } else if (showMid) {
-                infoEl.innerHTML = `
-                    <span class="cell-row value">${info.network}</span>
-                    <span class="cell-row dim">${info.bcast}</span>
-                `;
-            } else {
-                infoEl.innerHTML = `<span class="cell-row dim">${info.network}</span>`;
-            }
-
-            inner.appendChild(infoEl);
-        }
+        const hint = document.createElement('div');
+        hint.className   = 'split-hint';
+        hint.style.color = color;
+        hint.textContent = 'SPLIT ÷';
+        cell.appendChild(hint);
 
         cell.appendChild(inner);
 
-        // ── Split on click ─────────────────────────────────────────────────
+        // Click → split
         cell.addEventListener('click', () => {
             if (node.prefix >= 30) {
                 showToast('⚠  /30 is the minimum — only 4 IPs (2 usable)');
                 return;
             }
-            const numIps = node.endOct - node.startOct + 1;
-            const mid    = node.startOct + Math.floor(numIps / 2) - 1;
-            const depth  = node.prefix - startPrefix;
-            const dir    = depth % 2 === 0 ? 'h' : 'v';
-
+            const depth = node.prefix - startPrefix;
+            const dir   = depth % 2 === 0 ? 'h' : 'v';
+            const childPrefix = node.prefix + 1;
+            const childSize   = Math.pow(2, 32 - childPrefix);
             node.split = {
                 dir,
-                left:  makeNode(node.prefix + 1, node.startOct, mid),
-                right: makeNode(node.prefix + 1, mid + 1, node.endOct)
+                left:  makeNode(childPrefix, node.ipInt),
+                right: makeNode(childPrefix, (node.ipInt + childSize) >>> 0)
             };
             splitCount++;
             render([node.split.left.id, node.split.right.id]);
@@ -578,7 +615,18 @@ function render(animateIds = []) {
     updateStats();
 }
 
-// ── Stats & legend ────────────────────────────────────────────────────────────
+// ── Badge, stats, legend ──────────────────────────────────────────────────────
+function updateBadge() {
+    const mask    = maskFromPrefix(startPrefix);
+    const aligned = (baseIp & mask) >>> 0;
+    const total   = Math.pow(2, 32 - startPrefix);
+    const usable  = startPrefix <= 30 ? Math.max(0, total - 2) : 1;
+    document.getElementById('badgeAddr').textContent  = `${intToIp(aligned)}/${startPrefix}`;
+    document.getElementById('badgeTotal').textContent = formatCount(total);
+    document.getElementById('badgeUsable').textContent= formatCount(usable);
+    document.getElementById('badgeMask').textContent  = subnetMaskStr(startPrefix);
+}
+
 function updateStats() {
     document.getElementById('splitCount').textContent  = splitCount;
     document.getElementById('subnetCount').textContent = collectLeaves(tree).length;
@@ -602,6 +650,43 @@ function buildLegend() {
     }
 }
 
+// ── Input validation ──────────────────────────────────────────────────────────
+function parseNetworkInputs() {
+    const ids = ['oct1','oct2','oct3','oct4'];
+    let valid = true;
+    const octs = ids.map(id => {
+        const el  = document.getElementById(id);
+        const val = parseInt(el.value.trim(), 10);
+        if (isNaN(val) || val < 0 || val > 255) {
+            el.classList.add('error'); valid = false; return 0;
+        }
+        el.classList.remove('error');
+        return val;
+    });
+    if (!valid) { showToast('⚠  Invalid IP — each octet must be 0–255'); return null; }
+    return ipToInt(octs[0], octs[1], octs[2], octs[3]);
+}
+
+// Only allow digits in octet inputs
+['oct1','oct2','oct3','oct4'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => {
+        el.value = el.value.replace(/[^0-9]/g,'');
+        if (el.value.length === 3 || (el.value.length && parseInt(el.value)>25)) {
+            // Auto-advance to next field
+            const next = el.parentElement.children[Array.from(el.parentElement.children).indexOf(el) + 2];
+            if (next && next.tagName === 'INPUT') next.focus();
+        }
+    });
+    el.addEventListener('keydown', e => {
+        if (e.key === '.' || e.key === 'Tab') {
+            const inputs = document.querySelectorAll('.net-input');
+            const idx = Array.from(inputs).indexOf(el);
+            if (idx < 3) { e.preventDefault(); inputs[idx+1].focus(); }
+        }
+    });
+});
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 const toastEl = document.getElementById('toast');
 let toastTimer;
@@ -609,31 +694,42 @@ function showToast(msg) {
     clearTimeout(toastTimer);
     toastEl.textContent = msg;
     toastEl.classList.add('show');
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2800);
+    toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2800);
 }
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
+// ── Init / controls ───────────────────────────────────────────────────────────
 function init() {
     initTree();
     buildLegend();
+    updateBadge();
     render();
 }
 
 document.getElementById('prefixSlider').addEventListener('input', e => {
     document.getElementById('prefixDisplay').textContent = `/${e.target.value}`;
 });
+
 document.getElementById('applyBtn').addEventListener('click', () => {
+    const parsed = parseNetworkInputs();
+    if (parsed === null) return;
+    baseIp      = parsed;
     startPrefix = parseInt(document.getElementById('prefixSlider').value);
     init();
 });
+
 document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('oct1').value = '10';
+    document.getElementById('oct2').value = '0';
+    document.getElementById('oct3').value = '0';
+    document.getElementById('oct4').value = '0';
+    ['oct1','oct2','oct3','oct4'].forEach(id => document.getElementById(id).classList.remove('error'));
     document.getElementById('prefixSlider').value = 24;
     document.getElementById('prefixDisplay').textContent = '/24';
+    baseIp      = ipToInt(10,0,0,0);
     startPrefix = 24;
     init();
 });
 
-// Re-scale text on window resize
 window.addEventListener('resize', () => render());
 
 init();
