@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLSM Box Method Visualizer</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            background-color: #f8f9fa; 
+            color: #333;
+        }
+        #app-container {
+            width: 600px; 
+            height: 600px; 
+            border: 4px solid #212529; 
+            background: white; 
+            display: flex; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            margin-top: 20px;
+        }
+        .block { 
+            flex: 1; 
+            border: 1px solid #adb5bd; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-sizing: border-box;
+            transition: background 0.2s ease;
+        }
+        .leaf {
+            cursor: pointer;
+        }
+        .leaf:hover { 
+            background-color: #e9ecef; 
+        }
+        .block-content { 
+            text-align: center; 
+            pointer-events: none; 
+        }
+        .prefix { 
+            font-size: 1.4em; 
+            font-weight: bold; 
+            color: #0d6efd;
+        }
+        .ips { 
+            font-size: 0.9em; 
+            color: #495057; 
+            margin-top: 5px;
+        }
+        .row { flex-direction: row; }
+        .col { flex-direction: column; }
+        button { 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            background: #0d6efd; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: bold;
+        }
+        button:hover { background: #0b5ed7; }
+        .header { text-align: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>VLSM Box Method Visualizer</h1>
+        <p>Click any block to divide it in half. Visualize your subnets without overlapping.</p>
+        <button id="resetBtn">Reset to /24</button>
+    </div>
+    
+    <div id="app-container"></div>
+
+    <script>
+        const appContainer = document.getElementById('app-container');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function createBlock(prefix, startIp, endIp) {
+            const block = document.createElement('div');
+            block.className = 'block leaf';
+
+            const numIps = endIp - startIp + 1;
+
+            const content = document.createElement('div');
+            content.className = 'block-content';
+            content.innerHTML = `
+                <div class="prefix">/${prefix}</div>
+                <div class="ips">${numIps} IPs<br>.${startIp} - .${endIp}</div>
+            `;
+            block.appendChild(content);
+
+            block.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent parent blocks from triggering
+                
+                // Stop at /30
+                if (prefix >= 30) {
+                    alert("You have reached a /30 block. This is the smallest standard subnet for point-to-point links (4 IPs).");
+                    return;
+                }
+
+                // Remove leaf status and text
+                block.innerHTML = '';
+                block.classList.remove('leaf');
+                
+                // Alternate split direction based on prefix to keep boxes relatively square
+                block.classList.add(prefix % 2 === 0 ? 'row' : 'col');
+                block.style.cursor = 'default';
+
+                const midIp = startIp + (numIps / 2) - 1;
+
+                // Create the two new halves
+                const child1 = createBlock(prefix + 1, startIp, midIp);
+                const child2 = createBlock(prefix + 1, midIp + 1, endIp);
+
+                block.appendChild(child1);
+                block.appendChild(child2);
+            });
+
+            return block;
+        }
+
+        function init() {
+            appContainer.innerHTML = '';
+            appContainer.appendChild(createBlock(24, 0, 255));
+        }
+
+        resetBtn.addEventListener('click', init);
+        init(); // Start the app
+    </script>
+</body>
+</html>
