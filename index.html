@@ -4,135 +4,606 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VLSM Box Method Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px; 
-            background-color: #f8f9fa; 
-            color: #333;
+        :root {
+            --bg: #050a14;
+            --surface: #0a1628;
+            --border: #1a3a5c;
+            --text: #c8d8f0;
+            --muted: #4a6a8a;
+            --glow: 0 0 12px currentColor;
+ 
+            /* CIDR color palette — one per prefix depth step */
+            --c0:  #ff3a6e;
+            --c1:  #ff6b35;
+            --c2:  #ff9f1c;
+            --c3:  #f7d600;
+            --c4:  #a8ff3e;
+            --c5:  #2dffb3;
+            --c6:  #00e5ff;
+            --c7:  #3d9dff;
+            --c8:  #7b61ff;
+            --c9:  #cc44ff;
+            --c10: #ff44cc;
+            --c11: #ff3a6e;
         }
-        #app-container {
-            width: 600px; 
-            height: 600px; 
-            border: 4px solid #212529; 
-            background: white; 
-            display: flex; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            margin-top: 20px;
+ 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px 40px;
+            position: relative;
+            overflow-x: hidden;
         }
-        .block { 
-            flex: 1; 
-            border: 1px solid #adb5bd; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-sizing: border-box;
-            transition: background 0.2s ease;
+ 
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,160,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,160,255,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
         }
-        .leaf {
+ 
+        /* Scan line */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.07) 2px,
+                rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+ 
+        .wrapper { position: relative; z-index: 1; width: 100%; max-width: 820px; }
+ 
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+ 
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.4rem, 4vw, 2.4rem);
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            background: linear-gradient(135deg, #00e5ff, #7b61ff, #ff3a6e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+ 
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.82rem;
+            letter-spacing: 0.06em;
+        }
+ 
+        /* Controls bar */
+        .controls {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+ 
+        .slider-group {
+            flex: 1;
+            min-width: 260px;
+        }
+ 
+        .slider-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .slider-label span {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+ 
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
             cursor: pointer;
+            position: relative;
         }
-        .leaf:hover { 
-            background-color: #e9ecef; 
+ 
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00e5ff;
+            box-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0,229,255,0.4);
+            cursor: pointer;
+            transition: box-shadow 0.2s;
         }
-        .block-content { 
-            text-align: center; 
-            pointer-events: none; 
+ 
+        input[type="range"]:hover::-webkit-slider-thumb {
+            box-shadow: 0 0 16px #00e5ff, 0 0 30px rgba(0,229,255,0.6);
         }
-        .prefix { 
-            font-size: 1.4em; 
-            font-weight: bold; 
-            color: #0d6efd;
+ 
+        .tick-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            padding: 0 2px;
         }
-        .ips { 
-            font-size: 0.9em; 
-            color: #495057; 
-            margin-top: 5px;
+ 
+        .tick {
+            font-size: 0.6rem;
+            color: var(--muted);
+            opacity: 0.5;
         }
+ 
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+ 
+        .btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+ 
+        .btn-primary {
+            background: transparent;
+            color: #00e5ff;
+            border: 1px solid #00e5ff;
+            box-shadow: 0 0 8px rgba(0,229,255,0.25), inset 0 0 8px rgba(0,229,255,0.05);
+        }
+        .btn-primary:hover {
+            background: rgba(0,229,255,0.1);
+            box-shadow: 0 0 18px rgba(0,229,255,0.5), inset 0 0 12px rgba(0,229,255,0.1);
+        }
+ 
+        .btn-danger {
+            background: transparent;
+            color: #ff3a6e;
+            border: 1px solid #ff3a6e;
+            box-shadow: 0 0 8px rgba(255,58,110,0.25), inset 0 0 8px rgba(255,58,110,0.05);
+        }
+        .btn-danger:hover {
+            background: rgba(255,58,110,0.1);
+            box-shadow: 0 0 18px rgba(255,58,110,0.5);
+        }
+ 
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+ 
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+ 
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+ 
+        /* Main canvas */
+        #app-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: 620px;
+            border: 1px solid var(--border);
+            background: #060d1a;
+            display: flex;
+            box-shadow: 0 0 40px rgba(0,160,255,0.08), 0 0 80px rgba(0,0,0,0.6);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+ 
+        /* Blocks */
+        .block {
+            flex: 1;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: background 0.15s ease;
+        }
+ 
+        .leaf {
+            cursor: crosshair;
+        }
+ 
+        .leaf:hover .block-content {
+            transform: scale(1.05);
+        }
+ 
+        .leaf::after {
+            content: '÷';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 0.7em;
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: rgba(255,255,255,0.6);
+        }
+ 
+        .leaf:hover::after {
+            opacity: 1;
+        }
+ 
+        .block-content {
+            text-align: center;
+            pointer-events: none;
+            transition: transform 0.15s ease;
+            padding: 4px;
+            max-width: 90%;
+        }
+ 
+        .prefix-badge {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 0 12px currentColor;
+            white-space: nowrap;
+        }
+ 
+        .ips {
+            font-size: 0.62em;
+            margin-top: 4px;
+            opacity: 0.7;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+ 
         .row { flex-direction: row; }
         .col { flex-direction: column; }
-        button { 
-            padding: 10px 20px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            background: #0d6efd; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            font-weight: bold;
+ 
+        /* Split animation */
+        @keyframes splitIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
         }
-        button:hover { background: #0b5ed7; }
-        .header { text-align: center; margin-bottom: 10px; }
+        .block.new-child {
+            animation: splitIn 0.22s ease forwards;
+        }
+ 
+        /* Info bar */
+        .info-bar {
+            margin-top: 14px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+ 
+        .info-chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+        .info-chip strong { color: var(--text); font-weight: normal; }
+ 
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0a1628;
+            border: 1px solid #ff3a6e;
+            color: #ff3a6e;
+            padding: 10px 22px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255,58,110,0.3);
+            white-space: nowrap;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>VLSM Box Method Visualizer</h1>
-        <p>Click any block to divide it in half. Visualize your subnets without overlapping.</p>
-        <button id="resetBtn">Reset to /24</button>
+ 
+<div class="wrapper">
+    <header>
+        <div class="title">VLSM BOX VISUALIZER</div>
+        <div class="subtitle">VARIABLE LENGTH SUBNET MASKING &mdash; BOX METHOD</div>
+    </header>
+ 
+    <div class="controls">
+        <div class="slider-group">
+            <div class="slider-label">
+                STARTING PREFIX
+                <span id="prefixDisplay">/24</span>
+            </div>
+            <input type="range" id="prefixSlider" min="0" max="30" value="24" step="1">
+            <div class="tick-row">
+                <span class="tick">/0</span>
+                <span class="tick">/8</span>
+                <span class="tick">/16</span>
+                <span class="tick">/24</span>
+                <span class="tick">/30</span>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="applyBtn">APPLY</button>
+            <button class="btn btn-danger" id="resetBtn">RESET</button>
+        </div>
     </div>
-    
+ 
+    <div class="legend" id="legend"></div>
+ 
     <div id="app-container"></div>
-
-    <script>
-        const appContainer = document.getElementById('app-container');
-        const resetBtn = document.getElementById('resetBtn');
-
-        function createBlock(prefix, startIp, endIp) {
-            const block = document.createElement('div');
-            block.className = 'block leaf';
-
-            const numIps = endIp - startIp + 1;
-
-            const content = document.createElement('div');
-            content.className = 'block-content';
-            content.innerHTML = `
-                <div class="prefix">/${prefix}</div>
-                <div class="ips">${numIps} IPs<br>.${startIp} - .${endIp}</div>
-            `;
-            block.appendChild(content);
-
-            block.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent parent blocks from triggering
-                
-                // Stop at /30
-                if (prefix >= 30) {
-                    alert("You have reached a /30 block. This is the smallest standard subnet for point-to-point links (4 IPs).");
-                    return;
-                }
-
-                // Remove leaf status and text
-                block.innerHTML = '';
-                block.classList.remove('leaf');
-                
-                // Alternate split direction based on prefix to keep boxes relatively square
-                block.classList.add(prefix % 2 === 0 ? 'row' : 'col');
-                block.style.cursor = 'default';
-
-                const midIp = startIp + (numIps / 2) - 1;
-
-                // Create the two new halves
-                const child1 = createBlock(prefix + 1, startIp, midIp);
-                const child2 = createBlock(prefix + 1, midIp + 1, endIp);
-
-                block.appendChild(child1);
-                block.appendChild(child2);
-            });
-
-            return block;
+ 
+    <div class="info-bar">
+        <div class="info-chip">SPLITS: <strong id="splitCount">0</strong></div>
+        <div class="info-chip">SUBNETS: <strong id="subnetCount">1</strong></div>
+        <div class="info-chip">CLICK A BLOCK TO HALVE IT</div>
+    </div>
+</div>
+ 
+<div id="toast"></div>
+ 
+<script>
+    // ── Config ──────────────────────────────────────────────────────────────
+    const COLORS = [
+        '#ff3a6e','#ff6b35','#ff9f1c','#f7d600','#a8ff3e',
+        '#2dffb3','#00e5ff','#3d9dff','#7b61ff','#cc44ff',
+        '#ff44cc','#ff3a6e','#ff6b35','#ff9f1c','#f7d600',
+        '#a8ff3e','#2dffb3','#00e5ff','#3d9dff','#7b61ff',
+        '#cc44ff','#ff44cc','#ff3a6e','#ff6b35','#ff9f1c',
+        '#f7d600','#a8ff3e','#2dffb3','#00e5ff','#3d9dff',
+        '#7b61ff'
+    ];
+ 
+    const TOTAL_IPS = [
+        4294967296, 2147483648, 1073741824, 536870912, 268435456, 134217728,
+        67108864, 33554432, 16777216, 8388608, 4194304, 2097152, 1048576,
+        524288, 262144, 131072, 65536, 32768, 16384, 8192, 4096,
+        2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4
+    ];
+ 
+    function formatCount(n) {
+        if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+        if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'K';
+        return n;
+    }
+ 
+    // ── State ────────────────────────────────────────────────────────────────
+    let startPrefix = 24;
+    let splitCount = 0;
+ 
+    const appContainer = document.getElementById('app-container');
+    const prefixSlider = document.getElementById('prefixSlider');
+    const prefixDisplay = document.getElementById('prefixDisplay');
+    const splitCountEl = document.getElementById('splitCount');
+    const subnetCountEl = document.getElementById('subnetCount');
+    const toast = document.getElementById('toast');
+    let toastTimer;
+ 
+    // ── Toast ────────────────────────────────────────────────────────────────
+    function showToast(msg) {
+        clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+ 
+    // ── Stats ────────────────────────────────────────────────────────────────
+    function updateStats() {
+        splitCountEl.textContent = splitCount;
+        const leaves = appContainer.querySelectorAll('.leaf').length;
+        subnetCountEl.textContent = leaves;
+    }
+ 
+    // ── Legend ───────────────────────────────────────────────────────────────
+    function buildLegend() {
+        const legend = document.getElementById('legend');
+        legend.innerHTML = '';
+        const maxDepth = Math.min(30 - startPrefix, 7); // show up to 8 levels
+        for (let d = 0; d <= maxDepth; d++) {
+            const p = startPrefix + d;
+            if (p > 30) break;
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            const dot = document.createElement('div');
+            dot.className = 'legend-dot';
+            dot.style.background = COLORS[p];
+            dot.style.boxShadow = `0 0 6px ${COLORS[p]}`;
+            item.appendChild(dot);
+            item.appendChild(document.createTextNode(`/${p}`));
+            legend.appendChild(item);
         }
-
-        function init() {
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createBlock(24, 0, 255));
+    }
+ 
+    // ── Block creation ────────────────────────────────────────────────────────
+    function getFontSize(prefix, containerSize) {
+        // Estimate remaining levels to determine block density
+        const depth = prefix - startPrefix;
+        const base = Math.max(7, 22 - depth * 2.5);
+        return `${base}px`;
+    }
+ 
+    function createBlock(prefix, startOctet, endOctet, isNew) {
+        const block = document.createElement('div');
+        block.className = 'block leaf' + (isNew ? ' new-child' : '');
+        if (isNew) setTimeout(() => block.classList.remove('new-child'), 300);
+ 
+        const color = COLORS[Math.min(prefix, COLORS.length - 1)];
+        const numIps = endOctet - startOctet + 1;
+        const ipCount = TOTAL_IPS[prefix] || numIps;
+ 
+        // Background tint
+        block.style.backgroundColor = hexToRgba(color, 0.05);
+        block.style.borderColor = hexToRgba(color, 0.22);
+ 
+        block.addEventListener('mouseenter', () => {
+            block.style.backgroundColor = hexToRgba(color, 0.13);
+            block.style.boxShadow = `inset 0 0 20px ${hexToRgba(color, 0.15)}`;
+        });
+        block.addEventListener('mouseleave', () => {
+            block.style.backgroundColor = hexToRgba(color, 0.05);
+            block.style.boxShadow = 'none';
+        });
+ 
+        const content = document.createElement('div');
+        content.className = 'block-content';
+ 
+        const badge = document.createElement('div');
+        badge.className = 'prefix-badge';
+        badge.style.color = color;
+        badge.style.fontSize = getFontSize(prefix);
+        badge.textContent = `/${prefix}`;
+ 
+        const ips = document.createElement('div');
+        ips.className = 'ips';
+        ips.style.color = color;
+ 
+        if (prefix <= 16) {
+            ips.innerHTML = `${formatCount(ipCount)} hosts`;
+        } else {
+            ips.innerHTML = `${numIps} IPs<br>.${startOctet}–.${endOctet}`;
         }
-
-        resetBtn.addEventListener('click', init);
-        init(); // Start the app
-    </script>
+ 
+        content.appendChild(badge);
+        content.appendChild(ips);
+        block.appendChild(content);
+ 
+        block.addEventListener('click', function(e) {
+            e.stopPropagation();
+ 
+            if (prefix >= 30) {
+                showToast(`⚠ /30 is the minimum — only 4 IPs (2 usable)`);
+                return;
+            }
+ 
+            // Split!
+            splitCount++;
+            block.innerHTML = '';
+            block.classList.remove('leaf');
+            block.style.backgroundColor = 'transparent';
+            block.style.borderColor = hexToRgba(COLORS[prefix], 0.1);
+            block.style.boxShadow = 'none';
+            block.style.cursor = 'default';
+ 
+            // Alternate direction for squarish results
+            block.classList.add((prefix - startPrefix) % 2 === 0 ? 'col' : 'row');
+ 
+            const mid = startOctet + Math.floor(numIps / 2) - 1;
+ 
+            const child1 = createBlock(prefix + 1, startOctet, mid, true);
+            const child2 = createBlock(prefix + 1, mid + 1, endOctet, true);
+ 
+            block.appendChild(child1);
+            block.appendChild(child2);
+ 
+            updateStats();
+        });
+ 
+        return block;
+    }
+ 
+    // ── Init ──────────────────────────────────────────────────────────────────
+    function init() {
+        splitCount = 0;
+        appContainer.innerHTML = '';
+        buildLegend();
+        const totalIps = TOTAL_IPS[startPrefix] || 256;
+        const displayIps = Math.min(totalIps, 256);
+        appContainer.appendChild(createBlock(startPrefix, 0, displayIps - 1, false));
+        updateStats();
+    }
+ 
+    // ── Slider ────────────────────────────────────────────────────────────────
+    prefixSlider.addEventListener('input', () => {
+        prefixDisplay.textContent = `/${prefixSlider.value}`;
+    });
+ 
+    document.getElementById('applyBtn').addEventListener('click', () => {
+        startPrefix = parseInt(prefixSlider.value);
+        init();
+    });
+ 
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        prefixSlider.value = 24;
+        prefixDisplay.textContent = '/24';
+        startPrefix = 24;
+        init();
+    });
+ 
+    // ── Util: hex → rgba ──────────────────────────────────────────────────────
+    function hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1,3), 16);
+        const g = parseInt(hex.slice(3,5), 16);
+        const b = parseInt(hex.slice(5,7), 16);
+        return `rgba(${r},${g},${b},${alpha})`;
+    }
+ 
+    init();
+</script>
 </body>
 </html>
